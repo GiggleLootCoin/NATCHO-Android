@@ -15,4 +15,6 @@ Included:
 - Persistent provider settings.
 - No API keys hard-coded into the APK.
 
+Build verification: the Android source is compiled by GitHub Actions before an APK is considered ready.
+
 A large GGUF is not bundled in this APK. NATCHO connects to a local model already running on the phone, such as PocketPal, or to an online provider.
