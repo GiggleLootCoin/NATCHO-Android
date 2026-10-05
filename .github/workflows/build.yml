@@ -3,8 +3,10 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "downloads/NATCHO.apk"
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,9 +29,20 @@ jobs:
           test -s app/build/outputs/apk/debug/app-debug.apk
           unzip -t app/build/outputs/apk/debug/app-debug.apk >/dev/null
           sha256sum app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish direct APK
+        run: |
+          mkdir -p downloads
+          cp app/build/outputs/apk/debug/app-debug.apk downloads/NATCHO.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/NATCHO.apk
+          git diff --cached --quiet && exit 0
+          git commit -m "Publish verified NATCHO APK [skip ci]"
+          git push origin HEAD:main
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: NATCHO-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+          archive: false
+          retention-days: 90
           if-no-files-found: error
